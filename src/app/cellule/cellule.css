@@ -1,0 +1,16 @@
+#container{
+    border-radius: 0;
+}
+div {
+    height: 100%;
+    width: 100%;
+    border-radius: 50%;
+}
+
+.joueur1 {
+    background-color: red;
+}
+
+.joueur2 {
+    background-color: blue;
+}

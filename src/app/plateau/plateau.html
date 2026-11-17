@@ -10,10 +10,10 @@
     </table>
     
     <table id="grilleInteraction">
-        @for (i of fakeArray9; track $index) {
+        @for (i of fakeArray9; track $index; let ligne = $index) {
         <tr>
-            @for(i of fakeArray9; track $index){
-            <td></td>
+            @for(j of fakeArray9; track $index; let colonne = $index){
+            <td><app-cellule [ligne]="ligne" [colonne]="colonne"></app-cellule></td>
             }
         </tr>
         }
