@@ -22,4 +22,13 @@ export class App {
   public rejouer(){
     this.gameManager.rejouer();
   }
+  public save(){
+    this.gameManager.sauvegarderPartie();
+  }
+  public charger(id: number){
+    this.gameManager.chargerPartie(id);
+  }
+  public supprimer(id:number){
+    this.gameManager.supprimerPartie(id)
+  }
 }

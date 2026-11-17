@@ -8,6 +8,14 @@ export interface Game {
   partieTerminee: boolean;
 }
 
+export interface PartieSauvegardee {
+  id: number;
+  nom: string;
+  game: Game;
+  nbDePiecePose: number;
+  nbTourPasse: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -17,8 +25,14 @@ export class GameManager {
   nbTourPasse: number = 0;
   labelUtilisateur = signal("");
 
+  partieSauvegardees: PartieSauvegardee[] = []
+
 
   constructor() {
+    const sauvegardes = localStorage.getItem('parties');
+    if (sauvegardes !== null) {
+      this.partieSauvegardees = JSON.parse(sauvegardes)
+    }
     this.game = signal<Game>(this.creerPartie())
   }
 
@@ -161,5 +175,33 @@ export class GameManager {
     this.nbDePiecePose = 0;
     this.nbTourPasse = 0;
     this.labelUtilisateur.set('Nouvelle partie lancé !!!!!');
+  }
+
+  public sauvegarderPartie() {
+    let save: PartieSauvegardee = {
+      id: Date.now(),
+      nom: 'Partie ' + this.partieSauvegardees.length,
+      game: this.game(),
+      nbDePiecePose: this.nbDePiecePose,
+      nbTourPasse: this.nbTourPasse
+    }
+    this.partieSauvegardees.push(save)
+
+    localStorage.setItem('parties', JSON.stringify(this.partieSauvegardees));
+  }
+
+  public chargerPartie(id: number) {
+    const partie = this.partieSauvegardees.find(p => p.id === id)
+    if (partie === undefined) {
+      return;
+    }
+    this.game.set(structuredClone(partie.game));
+    this.nbTourPasse = partie.nbTourPasse;
+    this.nbDePiecePose = partie.nbDePiecePose;
+  }
+
+  public supprimerPartie(id: number) {
+    this.partieSauvegardees = this.partieSauvegardees.filter(ps => ps.id !== id);
+    localStorage.setItem('parties', JSON.stringify(this.partieSauvegardees));
   }
 }

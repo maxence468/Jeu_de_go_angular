@@ -13,7 +13,8 @@ p {
     color: var(--texte-secondaire);
 }
 
-#infoUtilisateur, #infoFinPartie {
+#infoUtilisateur,
+#infoFinPartie {
     display: flex;
     gap: 2rem;
     background-color: var(--couleur-info);
@@ -22,7 +23,7 @@ p {
     border-radius: 10px;
 }
 
-#infoFinPartie{
+#infoFinPartie {
     margin-top: 20px;
 }
 
@@ -41,6 +42,18 @@ button {
     cursor: pointer;
 }
 
-button:hover{
+button:hover {
     background-color: var(--couleur-bouton-hover);
+}
+
+#panneauGauche {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background-color: var(--couleur-info);
+    border-radius: 20px;
+    width: 250px;
+    height: 90vh;
+    padding: 15px;
+
 }

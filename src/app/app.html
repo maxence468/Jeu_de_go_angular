@@ -15,6 +15,7 @@
     <div id="divBtn">
         <button (click)="finDeTour()">Fin de tour</button>
         <button (click)="passer()">Passer</button>
+        <button (click)="save()">SAVE</button>
     </div>
     }
     @else{
@@ -34,5 +35,14 @@
     }
 
 </main>
-
+<div id="panneauGauche">
+    @if (gameManager.partieSauvegardees.length === 0) {
+    <p>Aucune partie sauvegardée</p>
+    }
+    @for (partieSauvegardee of gameManager.partieSauvegardees; track partieSauvegardee.id) {
+    <p>{{partieSauvegardee.nom}}</p>
+    <button (click)="charger(partieSauvegardee.id)">Charger</button>
+    <button (click)="supprimer(partieSauvegardee.id)">Supprimer</button>
+    }
+</div>
 <router-outlet />
