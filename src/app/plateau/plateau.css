@@ -1,0 +1,36 @@
+#container {
+    position: relative;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: 70dvh;
+    width: 70dvh;
+
+    border: 1px solid black;
+}
+
+#grilleInteraction {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+
+#grilleAffichage {
+    position: absolute;
+    height: 90%;
+    width: 90%;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+#grilleAffichage td{
+  border: 1px solid red;
+}
+
+#grilleInteraction td{
+  border: 1px solid blue;
+}
