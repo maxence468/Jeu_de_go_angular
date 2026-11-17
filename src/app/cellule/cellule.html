@@ -1,4 +1,4 @@
-<div id="container" (click)="placer()">
+<div id="container" (click)="placer()" (contextmenu)="retirer($event)">
     @if (joueur() == 0) {
 
     }

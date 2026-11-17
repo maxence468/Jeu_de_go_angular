@@ -18,4 +18,9 @@ export class Cellule {
     this.gameManager.placerCellule(this.ligne(), this.colonne())
 
   }
+
+  public retirer(event: MouseEvent){
+    event.preventDefault();
+    this.gameManager.retirerCellule(this.ligne(), this.colonne())
+  }
 }

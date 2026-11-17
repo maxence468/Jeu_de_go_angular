@@ -1,7 +1,38 @@
-
-
 <main class="main">
+    <h1>Jeu de go !!</h1>
+    <div id="infoUtilisateur">
+        @if(!gameManager.game().partieTerminee) {
+        <p>Tour du joueur {{gameManager.game().tourActuel}}</p>
+        }
+        <p><span id="scoreJoueur1">noir : {{gameManager.game().scoreJoueur1}}</span> - <span id="scoreJoueur2">blanc :
+                {{gameManager.game().scoreJoueur2}}</span></p>
+        <p>
+            {{gameManager.labelUtilisateur()}}
+        </p>
+    </div>
     <app-plateau></app-plateau>
+    @if(!gameManager.game().partieTerminee) {
+    <div id="divBtn">
+        <button (click)="finDeTour()">Fin de tour</button>
+        <button (click)="passer()">Passer</button>
+    </div>
+    }
+    @else{
+    <div id="infoFinPartie">
+        <p>La partie est terminée !!!</p>
+        @if (gameManager.game().scoreJoueur1 > gameManager.game().scoreJoueur2) {
+        <p>Le joueur 1 gagne la partie !</p>
+        }
+        @else if(gameManager.game().scoreJoueur1 < gameManager.game().scoreJoueur2){ <p>Le joueur 2 gagne la partie !
+            </p>
+            }
+            @else{
+            <p>Egalité !!!!!</p>
+            }
+    </div>
+    <button (click)="rejouer()">Rejouer</button>
+    }
+
 </main>
 
 <router-outlet />
