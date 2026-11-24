@@ -1,4 +1,4 @@
-import { Injectable, signal, WritableSignal } from '@angular/core';
+import { Injectable, signal, WritableSignal, computed } from '@angular/core';
 
 export interface Game {
   scoreJoueur1: number;
@@ -8,12 +8,19 @@ export interface Game {
   partieTerminee: boolean;
 }
 
+export interface HistoriqueCoup {
+  game: Game,
+  nbPiecePose: number,
+  nbTourPasse: number,
+}
+
 export interface PartieSauvegardee {
   id: number;
   nom: string;
   game: Game;
   nbDePiecePose: number;
   nbTourPasse: number;
+  historiqueCoups: HistoriqueCoup[];
 }
 
 @Injectable({
@@ -27,26 +34,47 @@ export class GameManager {
 
   partieSauvegardees: PartieSauvegardee[] = []
 
+  historiqueCoups = signal<HistoriqueCoup[]>([]);
+  indexHistorique = signal(0);
+
+  gameAffiche = computed(() => {
+    if (this.indexHistorique() === this.historiqueCoups().length - 1) {
+      return this.game();
+    }
+
+    return this.historiqueCoups()[this.indexHistorique()]?.game ?? this.game();
+  });
+
+  consultationHistorique = computed(() =>
+    this.indexHistorique() < this.historiqueCoups().length - 1
+  );
+
 
   constructor() {
     const sauvegardes = localStorage.getItem('parties');
     if (sauvegardes !== null) {
       this.partieSauvegardees = JSON.parse(sauvegardes)
     }
+
     this.game = signal<Game>(this.creerPartie())
+    this.enregistrerCoup()
   }
 
-  private creerPartie(): Game {
+  private creerPartie(taille: number = 19): Game {
     return {
       scoreJoueur1: 0,
       scoreJoueur2: 0,
       tourActuel: 1,
-      plateau: Array.from({ length: 9 }, () => Array.from({ length: 9 }, () => 0)),
+      plateau: Array.from({ length: taille }, () => Array.from({ length: taille }, () => 0)),
       partieTerminee: false
     }
   }
 
   public placerCellule(ligne: number, colonne: number) {
+    if (this.consultationHistorique()) {
+      this.labelUtilisateur.set("Reviens au dernier tour pour jouer");
+      return;
+    }
     if (this.game().partieTerminee) {
       return;
     }
@@ -67,6 +95,10 @@ export class GameManager {
   }
 
   public retirerCellule(ligne: number, colonne: number) {
+    if (this.consultationHistorique()) {
+      this.labelUtilisateur.set("Reviens au dernier tour pour jouer");
+      return;
+    }
     if (this.game().partieTerminee) {
       return;
     }
@@ -127,9 +159,15 @@ export class GameManager {
     this.game.set(copieGame)
     this.nbDePiecePose = 0
     this.labelUtilisateur.set('changement de tour')
+
+    this.enregistrerCoup();
   }
 
   public finirTour() {
+    if (this.consultationHistorique()) {
+      this.labelUtilisateur.set("Reviens au dernier tour pour jouer");
+      return;
+    }
     if (this.game().partieTerminee) {
       return;
     }
@@ -141,6 +179,10 @@ export class GameManager {
   }
 
   public passerTour() {
+    if (this.consultationHistorique()) {
+      this.labelUtilisateur.set("Reviens au dernier tour pour jouer");
+      return;
+    }
     if (this.game().partieTerminee) {
       return;
     }
@@ -168,13 +210,44 @@ export class GameManager {
     }
     this.game.set(copieGame)
     this.labelUtilisateur.set('fin de la partie')
+
+    this.enregistrerCoup();
   }
 
-  public rejouer() {
-    this.game.set(this.creerPartie())
+  public rejouer(taille: number = this.game().plateau.length) {
+    this.game.set(this.creerPartie(taille))
     this.nbDePiecePose = 0;
     this.nbTourPasse = 0;
     this.labelUtilisateur.set('Nouvelle partie lancé !!!!!');
+
+    this.historiqueCoups.set([]);
+    this.enregistrerCoup();
+  }
+
+  public enregistrerCoup() {
+    let copieJeu = structuredClone(this.game())
+
+    let historiqueCoup: HistoriqueCoup = {
+      game: copieJeu,
+      nbPiecePose: this.nbDePiecePose,
+      nbTourPasse: this.nbTourPasse
+    }
+    this.historiqueCoups.update(historique => [
+      ...historique,
+      historiqueCoup
+    ]);
+    this.indexHistorique.set(this.historiqueCoups().length - 1);
+  }
+
+  public tourPrecedent() {
+    if (this.indexHistorique() > 0) {
+      this.indexHistorique.update(index => index - 1)
+    }
+  }
+  public tourSuivant() {
+    if (this.indexHistorique() < this.historiqueCoups().length - 1) {
+      this.indexHistorique.update(index => index + 1)
+    }
   }
 
   public sauvegarderPartie() {
@@ -183,7 +256,8 @@ export class GameManager {
       nom: 'Partie ' + this.partieSauvegardees.length,
       game: this.game(),
       nbDePiecePose: this.nbDePiecePose,
-      nbTourPasse: this.nbTourPasse
+      nbTourPasse: this.nbTourPasse,
+      historiqueCoups: structuredClone(this.historiqueCoups())
     }
     this.partieSauvegardees.push(save)
 
@@ -198,6 +272,15 @@ export class GameManager {
     this.game.set(structuredClone(partie.game));
     this.nbTourPasse = partie.nbTourPasse;
     this.nbDePiecePose = partie.nbDePiecePose;
+    this.historiqueCoups.set(
+      structuredClone(partie.historiqueCoups ?? [])
+    );
+    if (this.historiqueCoups().length === 0) {
+      this.enregistrerCoup();
+    }
+    this.indexHistorique.set(
+      this.historiqueCoups().length - 1
+    );
   }
 
   public supprimerPartie(id: number) {

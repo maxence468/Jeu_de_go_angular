@@ -1,11 +1,25 @@
 <main class="main">
     <h1>Jeu de go !!</h1>
+    <select #taille [value]="gameManager.game().plateau.length" (change)="gameManager.rejouer(+taille.value)">
+        <option value="9">9 × 9</option>
+        <option value="13">13 × 13</option>
+        <option value="19">19 × 19</option>
+    </select>
     <div id="infoUtilisateur">
         @if(!gameManager.game().partieTerminee) {
-        <p>Tour du joueur {{gameManager.game().tourActuel}}</p>
+
+        @if (gameManager.gameAffiche().tourActuel == 1) {
+        <p class="noir">Tour du joueur noir</p>
+        }@else {
+        <p class="blanc">Tour du joueur blanc</p>
         }
-        <p><span id="scoreJoueur1">noir : {{gameManager.game().scoreJoueur1}}</span> - <span id="scoreJoueur2">blanc :
-                {{gameManager.game().scoreJoueur2}}</span></p>
+        }
+        @if (gameManager.consultationHistorique()) {
+        <p>Consultation d'un ancien tour</p>
+        }
+        <p><span id="scoreJoueur1">noir : {{gameManager.gameAffiche().scoreJoueur1}}</span> - <span
+                id="scoreJoueur2">blanc :
+                {{gameManager.gameAffiche().scoreJoueur2}}</span></p>
         <p>
             {{gameManager.labelUtilisateur()}}
         </p>
@@ -16,6 +30,7 @@
         <button (click)="finDeTour()">Fin de tour</button>
         <button (click)="passer()">Passer</button>
         <button (click)="save()">SAVE</button>
+        <button (click)="rejouer()" class="gris">Relancer</button>
     </div>
     }
     @else{
@@ -31,7 +46,11 @@
             <p>Egalité !!!!!</p>
             }
     </div>
-    <button (click)="rejouer()">Rejouer</button>
+    <div id="divBtn">
+
+        <button (click)="rejouer()" class="gris">Rejouer</button>
+        <button (click)="save()">SAVE</button>
+    </div>
     }
 
 </main>
@@ -44,5 +63,20 @@
     <button (click)="charger(partieSauvegardee.id)">Charger</button>
     <button (click)="supprimer(partieSauvegardee.id)">Supprimer</button>
     }
+</div>
+
+<div id="navTour">
+    <button (click)="gameManager.tourPrecedent()" [disabled]="gameManager.indexHistorique() === 0">
+        ←
+    </button>
+
+    <span>
+        Tour {{ gameManager.indexHistorique() }}
+        / {{ gameManager.historiqueCoups().length - 1 }}
+    </span>
+
+    <button (click)="gameManager.tourSuivant()" [disabled]="!gameManager.consultationHistorique()">
+        →
+    </button>
 </div>
 <router-outlet />

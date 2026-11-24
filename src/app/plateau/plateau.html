@@ -1,24 +1,21 @@
 <div id="container">
-    <table id="grilleAffichage">
-        @for (i of fakeArray8; track $index) {
+    <table id="grilleAffichage" [style.width.%]="tailleGrilleAffichage()" [style.height.%]="tailleGrilleAffichage()">
+        @for (i of fakeArray8(); track $index) {
         <tr>
-            @for(i of fakeArray8; track $index){
+            @for(j of fakeArray8(); track $index){
             <td></td>
             }
         </tr>
         }
     </table>
-    
+
     <table id="grilleInteraction">
-        @for (i of fakeArray9; track $index; let ligne = $index) {
+        @for (i of fakeArray9(); track $index; let ligne = $index) {
         <tr>
-            @for(j of fakeArray9; track $index; let colonne = $index){
+            @for(j of fakeArray9(); track $index; let colonne = $index){
             <td><app-cellule [ligne]="ligne" [colonne]="colonne"></app-cellule></td>
             }
         </tr>
         }
     </table>
-
-
-
 </div>

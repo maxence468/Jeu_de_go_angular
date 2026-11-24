@@ -12,7 +12,7 @@ export class Cellule {
   ligne = input.required<number>()
   colonne = input.required<number>()
   gameManager = inject(GameManager)
-  joueur = computed(() => this.gameManager.game().plateau[this.ligne()][this.colonne()])
+  joueur = computed(() => this.gameManager.gameAffiche().plateau[this.ligne()][this.colonne()])
 
   public placer() {
     this.gameManager.placerCellule(this.ligne(), this.colonne())

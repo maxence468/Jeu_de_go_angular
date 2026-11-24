@@ -57,3 +57,45 @@ button:hover {
     padding: 15px;
 
 }
+
+.noir {
+    color: black;
+    font-weight: bolder;
+}
+
+.blanc {
+    color: #FFFFFF;
+}
+
+.gris{
+    background-color: gray;
+}
+
+
+#navTour {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: var(--couleur-info);
+    border-radius: 20px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    color: var(--couleur-texte);
+}
+
+#navTour button {
+    padding: 10px 15px;
+    font-size: 20px;
+}
+
+#navTour button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+#navTour span {
+    font-weight: bold;
+}
