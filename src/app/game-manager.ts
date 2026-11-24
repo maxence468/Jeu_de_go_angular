@@ -1,5 +1,6 @@
 import { Injectable, signal, WritableSignal, computed } from '@angular/core';
 
+//etat de la partie à un moment donné
 export interface Game {
   scoreJoueur1: number;
   scoreJoueur2: number;
@@ -8,12 +9,14 @@ export interface Game {
   partieTerminee: boolean;
 }
 
+//etat enregistré d'une partie 
 export interface HistoriqueCoup {
   game: Game,
   nbPiecePose: number,
   nbTourPasse: number,
 }
 
+//toutes les informations d'une partie pour la sauvegarder et la charger
 export interface PartieSauvegardee {
   id: number;
   nom: string;
@@ -27,36 +30,47 @@ export interface PartieSauvegardee {
   providedIn: 'root',
 })
 export class GameManager {
+
+  //WritableSignal : signal modifiable et previens automatiquemetn angular quand cette valeur change pour actualiser l'interface
   game: WritableSignal<Game>;
   nbDePiecePose: number = 0;
   nbTourPasse: number = 0;
+
   labelUtilisateur = signal("");
 
   partieSauvegardees: PartieSauvegardee[] = []
 
+  //signal : donnée qui est syncronisée avec l'affichage
   historiqueCoups = signal<HistoriqueCoup[]>([]);
   indexHistorique = signal(0);
 
+  //COmputed : signal qui depend à d'autre signaux qui est actualisé automatiquement quand un des signaux change  
   gameAffiche = computed(() => {
+    //verifie si on consulte le dernier tour 
     if (this.indexHistorique() === this.historiqueCoups().length - 1) {
+      //on affiche les informations réelles de la partie
       return this.game();
     }
-
+    //on ne consulte pas le dernier tour : On recupere l'ancien etat de l'index 
     return this.historiqueCoups()[this.indexHistorique()]?.game ?? this.game();
   });
 
+  //booleen : est ce qu'on est entrain de regarder l'historique ?
+  //empecher modification si on est dans l'historique de la partie
   consultationHistorique = computed(() =>
     this.indexHistorique() < this.historiqueCoups().length - 1
   );
 
 
   constructor() {
+    //on recuperes les partie sauvegardées du localstorage 
     const sauvegardes = localStorage.getItem('parties');
     if (sauvegardes !== null) {
       this.partieSauvegardees = JSON.parse(sauvegardes)
     }
-
+    //creation de la partie 
     this.game = signal<Game>(this.creerPartie())
+    //on enregistre le plateau vide dans l'historique 
     this.enregistrerCoup()
   }
 
@@ -78,11 +92,14 @@ export class GameManager {
     if (this.game().partieTerminee) {
       return;
     }
+    //cellule ou l'utilisateur a cliqué 
     let celluleTmp = this.game().plateau[ligne][colonne]
+
     if (this.nbDePiecePose > 0) {
       this.labelUtilisateur.set("on peut poser qu'une piece par tour")
       return;
     }
+    //si elle est vide on place une pierre de la couleur du joueur actuel
     if (celluleTmp == 0) {
       this.changerValeurCellule(ligne, colonne, this.game().tourActuel)
       this.nbDePiecePose++;
@@ -102,6 +119,7 @@ export class GameManager {
     if (this.game().partieTerminee) {
       return;
     }
+    //cellule ou l'utilisateur a cliqué 
     let celluleTmp = this.game().plateau[ligne][colonne]
     if (celluleTmp == 0) {
       this.labelUtilisateur.set('Aucun jeton à retirer ici')
@@ -118,7 +136,10 @@ export class GameManager {
   }
 
   public donnerPoint(joueur: number) {
+    //si on modifie game directement l'objet reste le meme et angular n'est pas notifié du changement 
+    //on fait une copie pour mettre à jour game    
     const copieGame = {
+      //... récupére toutes les propriétés de la partie actuelle dans un nouvel objet
       ...this.game()
     }
     if (joueur == 1) {
@@ -225,6 +246,7 @@ export class GameManager {
   }
 
   public enregistrerCoup() {
+    //copie 'profonde' : éviter que les modifications de la partie actuelle affectent les anciens tours
     let copieJeu = structuredClone(this.game())
 
     let historiqueCoup: HistoriqueCoup = {

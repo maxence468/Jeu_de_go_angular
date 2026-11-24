@@ -9,8 +9,12 @@ import { GameManager } from '../game-manager';
   styleUrl: './plateau.css',
 })
 export class Plateau {
+  //inject : recuperer les instances d'un service 
+  //permet d'acceder à la partie partagée entre les composants  
   gameManager = inject(GameManager)
 
+  //adapte la taille de la grille d'affichage pour aligner avec la grille de jeu 
+  //pour differentes tailles de plateau 
   tailleGrilleAffichage = computed(() =>
     90 * (this.taille() - 1) / this.taille()
   );
